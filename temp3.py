@@ -1,0 +1,110 @@
+from fyers_api.Websocket import ws
+from fyers_api import fyersModel
+import numpy as np
+from datetime import datetime
+
+print("file is getting exhicuted")
+client_id = '5ISLSS90GN-100'
+secret_key = '7XYC33VXZ1'
+ltplist = []
+
+
+
+log_path = "F:\common\python\AlgoTrading\logs"
+token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhcGkuZnllcnMuaW4iLCJpYXQiOjE2NTQxNDM4NDMsImV4cCI6MTY1NDIxNjIwMywibmJmIjoxNjU0MTQzODQzLCJhdWQiOlsieDowIiwieDoxIiwieDoyIiwiZDoxIiwiZDoyIiwieDoxIiwieDowIl0sInN1YiI6ImFjY2Vzc190b2tlbiIsImF0X2hhc2giOiJnQUFBQUFCaW1EdGpfeUg4YWlMbXM5UGNLeVVIRGdka1NEYzdnU0trU0xrQ2UzZm5vSkRpVlNVdXNQTVpLVVRZYUdWY0VlN3BEM2tRS3kxQ0lpMFc4T1M0T05QSGJFTThRcDNkTEctUm85anBxYV83ZENFZDRNUT0iLCJkaXNwbGF5X25hbWUiOiJBQkhJU0hFSyBLVU1BUiIsImZ5X2lkIjoiWEEzNDA4NiIsImFwcFR5cGUiOjEwMCwicG9hX2ZsYWciOiJOIn0.vbzXF_gqSNI3m8QVUzVh4UutXPZvaD0cmPmaNJWhTUU"
+fyers = fyersModel.FyersModel(client_id=client_id,token= token,log_path=log_path)
+fyers.token = token
+pr = fyers.get_profile()
+# ob = fyers.orderbook()
+print(pr)
+
+########## variables for order
+isorder = False
+quantity = int(2)
+symbol = ["NSE:INFY-EQ"]
+type = 2 #2 for market order
+side = 1  # 1 for BUY order and -1 for SELL order
+productType = "INTRADAY" 
+# target_price = int(ltp*0.02)
+# stoploss_price = int(ltp*0.01)
+##########
+
+########### To get the data
+acess_token = client_id+":"+token
+data_type = "symbolData"
+#######
+
+def placeorder(side):
+	order1 = fyers.place_order({"symbol":symbol[0],"qty":quantity,"type":type,
+			"side":side,"productType":productType,"limitPrice":"0","stopPrice":"0",
+			"disclosedQty":"0","validity":"DAY","offlineOrder":"False","stopLoss":0,
+			"takeProfit":0})
+	print(order1)
+
+order = [False,True]
+i = [0]
+tim = []
+n = 59
+n2 = 20
+n3 = 300
+def custom_message(ticks) :
+	# fle = open('temp.txt','a')
+	sc = ticks[0]['symbol']
+	ltp = ticks[0]['ltp']
+	print(sc,ltp)
+	# fle.writelines(str(ltp) + ' ')
+	tim.append(i[0])
+	ltplist.append(ltp)
+	if i[0] >=n :
+		m,c = np.polyfit(tim[-1:-n-1:-1],ltplist[-1:-n-1:-1],1)
+		m5,c5 = np.polyfit(tim[-1:-n2-1:-1],ltplist[-1:-n2-1:-1],1)
+		m5m,c = np.polyfit(tim,ltplist,1)
+		if i[0] >= n3 :
+			ltplist.pop(0)
+			tim.pop(0)
+		# print('m5m is : ', m5m)
+		print(order[0],'  m is : ',m,'  m5 is : ', m5, '  m5m is : ', m5m)
+		bolbuy = ((0.01<m and 0.04<m5 and m5m > 0.001) or (m>m5m>0.003 and m5>0.01) )and not order[0]
+		if bolbuy :
+			ttm = datetime.now().strftime("%H:%M:%S")
+			fle = open('temp.txt','a')
+			fle.writelines('\n placed a buy order at ' + str(ltp) + ' m,m5 and m5m are : ' + str(m) + str(m5) + str(m5m)  + ' at ' + ttm + '\n')
+			print('placed a buy order ')
+			# placeorder(1)
+			order[0] = True
+			fle.close()
+		elif order[0] :
+			print('already ordered')
+		else :
+			print('not ordered yet')
+		bolsell = ((m5m < 0 and m5<0 and m < 0) or m5<-0.3 or m<-0.015)  and order[0]
+		if  bolsell :
+			ttm = datetime.now().strftime("%H:%M:%S")
+			fle = open('temp.txt','a')
+			fle.writelines('\n placed a sell order at ' + str(ltp)  + ' m,m5 and m5m are : ' + str(m) + str(m5) + str(m5m) + ' at ' + ttm + '\n')
+			print('placing a sell order')
+			# placeorder(-1)
+			order[0] = False
+			fle.close()
+	# fle.close()
+	i[0] += 1
+        
+        
+
+	##########  modify these conditions to place an order
+	
+		
+
+######### connecting to fyers socket for live data
+
+if pr['code'] == 200 :
+	fs = ws.FyersSocket(access_token=acess_token,run_background=False,log_path=log_path)
+	print("calling custom_message")
+	fs.websocket_data = custom_message
+	print('after custom message')
+	fs.subscribe(symbol=symbol,data_type=data_type)
+	print('custom message 2')
+	#fs.keep_running()
+else :
+	print('error found')
+
