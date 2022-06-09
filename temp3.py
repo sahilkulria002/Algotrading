@@ -11,17 +11,18 @@ ltplist = []
 
 
 log_path = "F:\common\python\AlgoTrading\logs"
-token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhcGkuZnllcnMuaW4iLCJpYXQiOjE2NTQxNDM4NDMsImV4cCI6MTY1NDIxNjIwMywibmJmIjoxNjU0MTQzODQzLCJhdWQiOlsieDowIiwieDoxIiwieDoyIiwiZDoxIiwiZDoyIiwieDoxIiwieDowIl0sInN1YiI6ImFjY2Vzc190b2tlbiIsImF0X2hhc2giOiJnQUFBQUFCaW1EdGpfeUg4YWlMbXM5UGNLeVVIRGdka1NEYzdnU0trU0xrQ2UzZm5vSkRpVlNVdXNQTVpLVVRZYUdWY0VlN3BEM2tRS3kxQ0lpMFc4T1M0T05QSGJFTThRcDNkTEctUm85anBxYV83ZENFZDRNUT0iLCJkaXNwbGF5X25hbWUiOiJBQkhJU0hFSyBLVU1BUiIsImZ5X2lkIjoiWEEzNDA4NiIsImFwcFR5cGUiOjEwMCwicG9hX2ZsYWciOiJOIn0.vbzXF_gqSNI3m8QVUzVh4UutXPZvaD0cmPmaNJWhTUU"
+token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhcGkuZnllcnMuaW4iLCJpYXQiOjE2NTQ2NzEwMzgsImV4cCI6MTY1NDczNDYzOCwibmJmIjoxNjU0NjcxMDM4LCJhdWQiOlsieDowIiwieDoxIiwieDoyIiwiZDoxIiwiZDoyIiwieDoxIiwieDowIl0sInN1YiI6ImFjY2Vzc190b2tlbiIsImF0X2hhc2giOiJnQUFBQUFCaW9FYS1STzVzWFZZb183SHQ4Z3V2UmNKQlJYYm9sTHJIamhrMkNvbTF6QVk1OFROUUtCX3FPVk50dnJrRldpaVpnMlRTZUZTRGJhVUhxMkVHbGQ0Q1YxaW1rTjR6Wk45Q01ZajlVUXNBZlFtbzNZOD0iLCJkaXNwbGF5X25hbWUiOiJBQkhJU0hFSyBLVU1BUiIsImZ5X2lkIjoiWEEzNDA4NiIsImFwcFR5cGUiOjEwMCwicG9hX2ZsYWciOiJOIn0.0jteJTD9Rw6GnLWpeJT-JmDMtDNPNNDc4TaZMrGt2GI"
 fyers = fyersModel.FyersModel(client_id=client_id,token= token,log_path=log_path)
 fyers.token = token
 pr = fyers.get_profile()
-# ob = fyers.orderbook()
+ob = fyers.orderbook()
+fd = fyers.funds()
 print(pr)
 
 ########## variables for order
 isorder = False
-quantity = int(2)
-symbol = ["NSE:INFY-EQ"]
+quantity = int(10)
+symbol = ["NSE:ONGC-EQ"]
 type = 2 #2 for market order
 side = 1  # 1 for BUY order and -1 for SELL order
 productType = "INTRADAY" 
@@ -43,6 +44,7 @@ def placeorder(side):
 
 order = [False,True]
 i = [0]
+bp = [0]
 tim = []
 n = 59
 n2 = 20
@@ -53,7 +55,7 @@ def custom_message(ticks) :
 	ltp = ticks[0]['ltp']
 	print(sc,ltp)
 	# fle.writelines(str(ltp) + ' ')
-	tim.append(i[0])
+	tim.append(i[0]*0.2)
 	ltplist.append(ltp)
 	if i[0] >=n :
 		m,c = np.polyfit(tim[-1:-n-1:-1],ltplist[-1:-n-1:-1],1)
@@ -63,29 +65,31 @@ def custom_message(ticks) :
 			ltplist.pop(0)
 			tim.pop(0)
 		# print('m5m is : ', m5m)
-		print(order[0],'  m is : ',m,'  m5 is : ', m5, '  m5m is : ', m5m)
-		bolbuy = ((0.01<m and 0.04<m5 and m5m > 0.001) or (m>m5m>0.003 and m5>0.01) )and not order[0]
-		if bolbuy :
-			ttm = datetime.now().strftime("%H:%M:%S")
-			fle = open('temp.txt','a')
-			fle.writelines('\n placed a buy order at ' + str(ltp) + ' m,m5 and m5m are : ' + str(m) + str(m5) + str(m5m)  + ' at ' + ttm + '\n')
-			print('placed a buy order ')
-			# placeorder(1)
-			order[0] = True
-			fle.close()
-		elif order[0] :
-			print('already ordered')
-		else :
-			print('not ordered yet')
-		bolsell = ((m5m < 0 and m5<0 and m < 0) or m5<-0.3 or m<-0.015)  and order[0]
-		if  bolsell :
-			ttm = datetime.now().strftime("%H:%M:%S")
-			fle = open('temp.txt','a')
-			fle.writelines('\n placed a sell order at ' + str(ltp)  + ' m,m5 and m5m are : ' + str(m) + str(m5) + str(m5m) + ' at ' + ttm + '\n')
-			print('placing a sell order')
-			# placeorder(-1)
-			order[0] = False
-			fle.close()
+		if i[0] > 130 :
+			print(order[0],'  m is : ',m,'  m5 is : ', m5, '  m5m is : ', m5m)
+			bolbuy = ((0.01<m and 0.04<m5 and m5m > 0.0015) or (m>m5m>0.003 and m5>0.01) )and not order[0]
+			if bolbuy and 162 < ltp < 166 :
+				ttm = datetime.now().strftime("%H:%M:%S")
+				fle = open('temp.txt','a')
+				fle.writelines('\n placed a buy order at ' + str(ltp) + ' m,m5 and m5m are : ' + str(m) + str(m5) + str(m5m)  + ' at ' + ttm + '\n')
+				print('placed a buy order ')
+				bp[0] = ltp
+				# placeorder(1)
+				order[0] = True
+				fle.close()
+			elif order[0] :
+				print('already ordered')
+			else :
+				print('not ordered yet')
+			bolsell = ((m5m < 0 and m5<0 and m < 0) or m5<-0.3 or m<-0.018)  and order[0]
+			if  bolsell and ltp > (bp[0]+0.5) :
+				ttm = datetime.now().strftime("%H:%M:%S")
+				fle = open('temp.txt','a')
+				fle.writelines('\n placed a sell order at ' + str(ltp)  + ' m,m5 and m5m are : ' + str(m) + str(m5) + str(m5m) + ' at ' + ttm + '\n')
+				print('placing a sell order')
+				# placeorder(-1)
+				order[0] = False
+				fle.close()
 	# fle.close()
 	i[0] += 1
         
