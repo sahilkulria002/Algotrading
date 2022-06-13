@@ -10,8 +10,8 @@ ltplist = []
 
 
 
-log_path = "F:\common\python\AlgoTrading\logs"
-token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhcGkuZnllcnMuaW4iLCJpYXQiOjE2NTQ2NzEwMzgsImV4cCI6MTY1NDczNDYzOCwibmJmIjoxNjU0NjcxMDM4LCJhdWQiOlsieDowIiwieDoxIiwieDoyIiwiZDoxIiwiZDoyIiwieDoxIiwieDowIl0sInN1YiI6ImFjY2Vzc190b2tlbiIsImF0X2hhc2giOiJnQUFBQUFCaW9FYS1STzVzWFZZb183SHQ4Z3V2UmNKQlJYYm9sTHJIamhrMkNvbTF6QVk1OFROUUtCX3FPVk50dnJrRldpaVpnMlRTZUZTRGJhVUhxMkVHbGQ0Q1YxaW1rTjR6Wk45Q01ZajlVUXNBZlFtbzNZOD0iLCJkaXNwbGF5X25hbWUiOiJBQkhJU0hFSyBLVU1BUiIsImZ5X2lkIjoiWEEzNDA4NiIsImFwcFR5cGUiOjEwMCwicG9hX2ZsYWciOiJOIn0.0jteJTD9Rw6GnLWpeJT-JmDMtDNPNNDc4TaZMrGt2GI"
+log_path = "C:/Users/ksahil/alg/logs"
+token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhcGkuZnllcnMuaW4iLCJpYXQiOjE2NTUwOTM1OTUsImV4cCI6MTY1NTE2NjYxNSwibmJmIjoxNjU1MDkzNTk1LCJhdWQiOlsieDowIiwieDoxIiwieDoyIiwiZDoxIiwiZDoyIiwieDoxIiwieDowIl0sInN1YiI6ImFjY2Vzc190b2tlbiIsImF0X2hhc2giOiJnQUFBQUFCaXBybGI1U2hOQ3NWaVVEUFY1aTRta1o2VkNHSWJMNFZVdk1MajNVYVNPY0tBZmg3WWNVNEI3X21oaFg3T1lNMGstc2VyYlBlUk01TkZ2a0N4eng2NjZWaFkyMGYtdUZnNnE3RmNyNDROVmVfMUQ5WT0iLCJkaXNwbGF5X25hbWUiOiJBQkhJU0hFSyBLVU1BUiIsImZ5X2lkIjoiWEEzNDA4NiIsImFwcFR5cGUiOjEwMCwicG9hX2ZsYWciOiJOIn0.WEot_tm6Y_-jF52tk_pynHkKn_wLw46kP39s9vk7Knc"
 fyers = fyersModel.FyersModel(client_id=client_id,token= token,log_path=log_path)
 fyers.token = token
 pr = fyers.get_profile()
@@ -22,7 +22,7 @@ print(pr)
 ########## variables for order
 isorder = False
 quantity = int(10)
-symbol = ["NSE:ONGC-EQ"]
+symbol = ["NSE:BANKNIFTY2261634500PE"]
 type = 2 #2 for market order
 side = 1  # 1 for BUY order and -1 for SELL order
 productType = "INTRADAY" 
@@ -55,8 +55,8 @@ def custom_message(ticks) :
 	ltp = ticks[0]['ltp']
 	print(sc,ltp)
 	# fle.writelines(str(ltp) + ' ')
-	tim.append(i[0]*0.2)
-	ltplist.append(ltp)
+	tim.append(i[0])
+	ltplist.append(round(ltp/10,3))
 	if i[0] >=n :
 		m,c = np.polyfit(tim[-1:-n-1:-1],ltplist[-1:-n-1:-1],1)
 		m5,c5 = np.polyfit(tim[-1:-n2-1:-1],ltplist[-1:-n2-1:-1],1)
@@ -67,8 +67,8 @@ def custom_message(ticks) :
 		# print('m5m is : ', m5m)
 		if i[0] > 130 :
 			print(order[0],'  m is : ',m,'  m5 is : ', m5, '  m5m is : ', m5m)
-			bolbuy = ((0.01<m and 0.04<m5 and m5m > 0.0015) or (m>m5m>0.003 and m5>0.01) )and not order[0]
-			if bolbuy and 162 < ltp < 166 :
+			bolbuy = ((0.025<m and 0.03<m5 and m5m > 0.0015) or (m>m5m>0.005 and m5>0.01) )and not order[0]
+			if bolbuy :
 				ttm = datetime.now().strftime("%H:%M:%S")
 				fle = open('temp.txt','a')
 				fle.writelines('\n placed a buy order at ' + str(ltp) + ' m,m5 and m5m are : ' + str(m) + str(m5) + str(m5m)  + ' at ' + ttm + '\n')
@@ -81,8 +81,8 @@ def custom_message(ticks) :
 				print('already ordered')
 			else :
 				print('not ordered yet')
-			bolsell = ((m5m < 0 and m5<0 and m < 0) or m5<-0.3 or m<-0.018)  and order[0]
-			if  bolsell and ltp > (bp[0]+0.5) :
+			bolsell = ((m5m < 0 and m5<0 and m < 0) or m5<m<-0.025)  and order[0]
+			if  bolsell and (ltp > (bp[0]+30)):
 				ttm = datetime.now().strftime("%H:%M:%S")
 				fle = open('temp.txt','a')
 				fle.writelines('\n placed a sell order at ' + str(ltp)  + ' m,m5 and m5m are : ' + str(m) + str(m5) + str(m5m) + ' at ' + ttm + '\n')
