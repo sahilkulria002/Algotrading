@@ -1,0 +1,103 @@
+from fyers_api import fyersModel
+import datetime
+import xlsxwriter
+
+
+# print("file is getting exhicuted")
+# client_id = '5ISLSS90GN-100'
+# secret_key = '7XYC33VXZ1'
+
+# log_path = "F:\common\python\AlgoTrading\logs"
+# tokenfile = open('F:/common/python/AlgoTrading/acessToken.txt', 'r')
+# token = tokenfile.readline()
+# fyers = fyersModel.FyersModel(client_id=client_id,token= token,log_path=log_path)
+# fyers.token = token
+# pr = fyers.get_profile()
+ept1 = int(datetime.datetime(2022,6,14,9,15,00).timestamp())
+ept2 = int(datetime.datetime(2022,6,14,10,15,00).timestamp())
+# print(pr)
+# resolution = '60'
+# data = {"symbol":"NSE:WIPRO-EQ",resolution:"1","date_format":"0","range_from":str(ept1),"range_to":str(ept2),"cont_flag":"1"}
+# hdata = fyers.history(data)
+# print(hdata)
+
+
+def openprice(fyers,symbol) :
+    data = {"symbol":symbol,'resolution':'60',"date_format":"0","range_from":str(ept1),"range_to":str(ept2),"cont_flag":"1"}
+    hdata = fyers.history(data)
+    print('Open price of BANKNIFTY2261634500PE is : ',hdata['candles'][0][1])
+    return hdata['candles'][0][1]
+
+def averprice(fyers,symbol) :
+        data = {"symbol":symbol,"resolution":'1',"date_format":"0","range_from":str(ept1),"range_to":str(ept2),"cont_flag":"1"}
+        hdata = fyers.history(data)
+        smforav = 0
+        for i in range(30):
+            val = hdata['candles'][i]
+            smforav += ((val[2] + val[3])/2)
+            # worksheet.write_row(i+1,1,val)
+        avrg = smforav/30
+        print(avrg)
+        return avrg
+
+
+def main() :
+    print(openprice('NSE:BANKNIFTY2261634500PE'))
+    # symbol = 'NSE:BANKNIFTY2261634500PE'
+    # data = {"symbol":symbol,'resolution':"60","date_format":"0","range_from":str(ept1),"range_to":str(ept2),"cont_flag":"1"}
+    # hdata = fyers.history(data)
+    # print(hdata)
+    # print("file is getting exhicuted")
+    # client_id = '5ISLSS90GN-100'
+    # secret_key = '7XYC33VXZ1'
+
+    # log_path = "F:\common\python\AlgoTrading\logs"
+    # tokenfile = open('F:/common/python/AlgoTrading/acessToken.txt', 'r')
+    # token = tokenfile.readline()
+    # fyers = fyersModel.FyersModel(client_id=client_id,token= token,log_path=log_path)
+    # fyers.token = token
+
+    # workbook = xlsxwriter.Workbook('hisData.xlsx')
+    # worksheet = workbook.add_worksheet()
+
+
+    # ept1 = int(datetime.datetime(2022,6,14,9,15,00).timestamp())
+    # ept2 = int(datetime.datetime(2022,6,14,10,15,00).timestamp())
+    
+
+
+    
+
+    
+
+    
+
+
+
+
+if __name__ == '__main__' :
+    main()
+
+
+
+# data = {"symbol":"NSE:WIPRO-EQ","resolution":"1","date_format":"0","range_from":str(ept1),"range_to":str(ept2),"cont_flag":"1"}
+
+# hdata = fyers.history(data)
+# row1 = ['Current epoch time','Open Value','Highest Value','Lowest Value','Close Value','Total traded quantity (volume)']
+# worksheet.write_row(0,1,row1)
+
+# smforav = 0 ##### sum for calculating the average price of first hour
+# i = 0
+# for i in range(30):
+#     val = hdata['candles'][i]
+#     smforav += ((val[2] + val[3])/2)
+#     worksheet.write_row(i+1,1,val)
+
+# avrg = smforav/30
+# fle = open('F:/common/python/AlgoTrading/averageprice.txt','w')
+# fle.writelines(str(avrg))
+# fle.close()
+# print(avrg)
+# workbook.close()
+# print((hdata))
+
