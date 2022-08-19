@@ -4,8 +4,8 @@ import xlsxwriter
 
 
 # print("file is getting exhicuted")
-# client_id = '5ISLSS90GN-100'
-# secret_key = '7XYC33VXZ1'
+# client_id = ''
+# secret_key = ''
 
 # log_path = "F:\common\python\AlgoTrading\logs"
 # tokenfile = open('F:/common/python/AlgoTrading/acessToken.txt', 'r')
@@ -48,8 +48,8 @@ def main() :
     # hdata = fyers.history(data)
     # print(hdata)
     # print("file is getting exhicuted")
-    # client_id = '5ISLSS90GN-100'
-    # secret_key = '7XYC33VXZ1'
+    # client_id = ''
+    # secret_key = ''
 
     # log_path = "F:\common\python\AlgoTrading\logs"
     # tokenfile = open('F:/common/python/AlgoTrading/acessToken.txt', 'r')
