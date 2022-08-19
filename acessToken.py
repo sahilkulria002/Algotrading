@@ -11,17 +11,17 @@ s=Service("F:\common\python\AlgoTrading\chromedriver_win32\chromedriver.exe")
 # driver = webdriver.Chrome(service=s)
 
 # log_path = document_file.log_path
-client_id = '5ISLSS90GN-100'
-secret_key = '7XYC33VXZ1'
+client_id = 'your_client_id'
+secret_key = 'secret key'
 redirect_url = 'https://www.google.com/'
 response_type = 'code'
 grant_type = "authorization_code"
-username = "XA34086"
-password = 'Abhideep@451'
-pin1 = "4"
-pin2 = "5"
-pin3 = "1"
-pin4 = "3"
+username = "your username"
+password = 'passwoard'
+pin1 = "x"
+pin2 = "y"
+pin3 = "z"
+pin4 = "a"
 
 def generate_auth_code():
 	url = f"https://api.fyers.in/api/v2/generate-authcode?client_id={client_id}&redirect_uri={redirect_url}&response_type=code&state=state&scope=&nonce="
