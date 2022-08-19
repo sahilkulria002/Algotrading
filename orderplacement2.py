@@ -29,8 +29,8 @@ prlmt = 20 ########## minimum profit range in rupees
 
 
 print("file is getting exhicuted")
-client_id = '5ISLSS90GN-100'
-secret_key = '7XYC33VXZ1'
+client_id = ''
+secret_key = ''
 
 
 log_path = "F:\common\python\AlgoTrading\logs"
